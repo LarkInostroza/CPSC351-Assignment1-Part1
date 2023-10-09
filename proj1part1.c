@@ -1,3 +1,5 @@
+//Lark Inostroza
+//CPSC 351 Project 1 Part 1
 #include <iostream>
 #include <string>
 #include <unistd.h>
@@ -11,38 +13,29 @@ int main() {
         std::string command;
         std::getline(std::cin, command);
 
+		//Exit Prompt
         if (command == "exit") {
             break;
         }
 
-        pid_t pid = fork();
+	    pid_t pid = fork();
 
-        if (pid == -1) {
-            perror("fork");
-            exit(EXIT_FAILURE);
-        } else if (pid == 0) { // Child process
+        if (pid < 0) {
+        	perror("fork");
+            exit(-1);
+        }
+    
+	    //Child Using Execlp
+        else if (pid == 0) {
             const char *cmd = command.c_str();
-            if (execlp(cmd, cmd, nullptr) == -1) {
-                perror("execlp");
-                exit(EXIT_FAILURE);
-            }
-        } else { // Parent process
-            int status;
-            pid_t child_pid = wait(&status);
+            execlp(cmd, cmd, nullptr);
+        }
 
-            if (child_pid == -1) {
-                perror("wait");
-                exit(EXIT_FAILURE);
-            }
-
-            if (WIFEXITED(status)) {
-                int exit_status = WEXITSTATUS(status);
-                std::cout << "Child exited with status " << exit_status << std::endl;
-            } else {
-                std::cerr << "Child process terminated abnormally." << std::endl;
-            }
+	    //Parent
+	    else {
+            int child_status;
+            pid_t child_pid = wait(&child_status);
         }
     }
-
     return 0;
 }
